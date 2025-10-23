@@ -11,8 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.accenture.product.enums.UrlEnum.*;
-
 @Service
 public class OrderService {
 
@@ -36,23 +34,20 @@ public class OrderService {
 
 
     private ProductDTO findProductByName(String name) {
-        String productFindUrl = String.format(PROD_FORMAT_URL.value(), PRODUCT_FIND_URL.value(), name);
-        ProductDTO productDTO = orderRemoteService.invokeGetProductService(productFindUrl);
+        ProductDTO productDTO = orderRemoteService.invokeGetProductService(name);
         return productDTO;
     }
 
     private void inventoryAvailable(ProductDTO product, Integer qty) {
-        String inventoryFindUrl = String.format(INV_FIND_FORMAT_URL.value(), INVENTORY_FIND_URL.value(), product.getCode());
-        InventoryDTO inventory = orderRemoteService.invokeGetInventoryService(inventoryFindUrl);
+        InventoryDTO inventory = orderRemoteService.invokeGetInventoryService(product.getCode());
         if (inventory.getQuantity() < qty) {
             throw new RuntimeException(String.format("No Stock , Expected quantity : %d , but available only : %d", qty, inventory.getQuantity()));
         } else if ((inventory.getQuantity() - qty) == 0) {
-            String inventoryUrl = String.format(INV_DELETE_FORMAT_URL.value(), INVENTORY_URL.value(), inventory.getId());
-            String message = orderRemoteService.invokeDeleteInventoryService(inventoryUrl);
-            LOG.info(message);
+            String prodDeletedMessage = orderRemoteService.invokeDeleteProductService(product.getCode());
+            String invDeletedMessage = orderRemoteService.invokeDeleteInventoryService(inventory.getId());
+            LOG.info("{} \n {}", prodDeletedMessage, invDeletedMessage);
         } else {
-            String inventoryUrl = String.format(INV_FORMAT_URL.value(), INVENTORY_URL.value(), inventory.getId(), qty);
-            orderRemoteService.invokeUpdateInventoryService(inventoryUrl);
+            orderRemoteService.invokeUpdateInventoryService(inventory.getId(), qty);
         }
 
     }
