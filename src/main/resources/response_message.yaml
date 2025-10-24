@@ -1,0 +1,2 @@
+response:
+  noStockMsg: "No Stock , Expected quantity : %d , but available only : %d"

@@ -1,5 +1,6 @@
 package com.accenture.product.service;
 
+import com.accenture.product.config.OrderResponseMsgConfig;
 import com.accenture.product.dto.InventoryDTO;
 import com.accenture.product.dto.OrderDTO;
 import com.accenture.product.dto.ProductDTO;
@@ -25,6 +26,9 @@ public class OrderService {
     @Autowired
     private OrderRemoteService orderRemoteService;
 
+    @Autowired
+    private OrderResponseMsgConfig orderResMsg;
+
     public OrderDTO placeOrder(String name, Integer qty) {
         ProductDTO product = findProductByName(name);
         inventoryAvailable(product, qty);
@@ -41,7 +45,7 @@ public class OrderService {
     private void inventoryAvailable(ProductDTO product, Integer qty) {
         InventoryDTO inventory = orderRemoteService.invokeGetInventoryService(product.getCode());
         if (inventory.getQuantity() < qty) {
-            throw new RuntimeException(String.format("No Stock , Expected quantity : %d , but available only : %d", qty, inventory.getQuantity()));
+            throw new RuntimeException(orderResMsg.stocksNotAvailable(qty, inventory.getQuantity()));
         } else if ((inventory.getQuantity() - qty) == 0) {
             String prodDeletedMessage = orderRemoteService.invokeDeleteProductService(product.getCode());
             String invDeletedMessage = orderRemoteService.invokeDeleteInventoryService(inventory.getId());

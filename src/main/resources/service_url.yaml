@@ -1,0 +1,12 @@
+order:
+  product:
+    url: "http://localhost:8080/product"
+    findUrl: "http://localhost:8080/product/find"
+    formatUrl: "%s?name=%s"
+    deleteFormatUrl: "%s?code=%s"
+  inventory:
+    url: "http://localhost:8081/inventory"
+    findUrl: "http://localhost:8081/inventory/find"
+    findFormaturl: "%s?productCode=%s"
+    deleteFormaturl: "%s?code=%s"
+    updateFormaturl: "%s?code=%s&qty=%s"
