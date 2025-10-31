@@ -15,4 +15,10 @@ public class ControllerAdvice {
     public String otherException(RuntimeException exception) {
         return exception.getMessage();
     }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String commonException(Exception exception) {
+        return exception.getMessage();
+    }
 }
